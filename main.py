@@ -202,17 +202,38 @@ st.markdown("""
         padding-top: 3rem;
     }
     
+    /* Mobile controls visibility */
+    .mobile-controls {
+        display: none;
+    }
+    
     /* Mobile responsiveness for columns */
     @media (max-width: 768px) {
-        /* Adjust column behavior on mobile */
-        [data-testid="column"] {
-            width: 100% !important;
+        /* Hide sidebar on mobile */
+        section[data-testid="stSidebar"] {
+            display: none !important;
         }
         
-        /* Adjust sidebar width on mobile */
-        section[data-testid="stSidebar"] {
-            min-width: 100% !important;
-            max-width: 100% !important;
+        /* Adjust sidebar toggle visibility */
+        button[kind="header"] {
+            display: none !important;
+        }
+        
+        /* Show mobile controls on mobile */
+        .mobile-controls {
+            display: block !important;
+            padding: 0.5rem;
+        }
+        
+        /* Hide mobile controls section divider on mobile */
+        .mobile-controls + hr {
+            margin: 0.5rem 0;
+        }
+        
+        /* Make main content full width on mobile */
+        .main .block-container {
+            width: 100% !important;
+            padding: 0 !important;
         }
         
         /* Better spacing on mobile */
@@ -220,8 +241,25 @@ st.markdown("""
             padding: 0.75rem 0.5rem;
         }
         
-        .input-container {
-            padding: 0.75rem;
+        /* Adjust chat input container on mobile */
+        [data-testid="chatInputContainer"] {
+            padding: 0.75rem !important;
+        }
+        
+        /* Smaller font on mobile */
+        .chat-header h1 {
+            font-size: 18px;
+        }
+        
+        .chat-header p {
+            font-size: 14px;
+        }
+    }
+    
+    @media (min-width: 769px) {
+        /* Hide mobile controls on desktop */
+        .mobile-controls {
+            display: none !important;
         }
     }
     
@@ -283,6 +321,28 @@ def translate_text(src, tgt, text):
 
 # Main UI
 def main():
+    # Mobile language selector (only visible on mobile)
+    with st.container():
+        st.markdown('<div class="mobile-controls">', unsafe_allow_html=True)
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🇬🇧 → 🇷🇼 EN→RW", use_container_width=True, key="mobile_en_rw", 
+                         type="primary" if st.session_state.source_lang == "en" else "secondary"):
+                st.session_state.source_lang = "en"
+                st.rerun()
+        with col2:
+            if st.button("🇷🇼 → 🇬🇧 RW→EN", use_container_width=True, key="mobile_rw_en",
+                         type="primary" if st.session_state.source_lang == "rw" else "secondary"):
+                st.session_state.source_lang = "rw"
+                st.rerun()
+        
+        if st.button("🗑️ Clear Chat", use_container_width=True, key="mobile_clear"):
+            st.session_state.chat_history = []
+            st.rerun()
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+    
     # Header
     st.markdown("""
     <div class="chat-header">
